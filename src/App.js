@@ -16,9 +16,7 @@ function App() {
   };
   // Hàm cập nhật
   const handleUpdateEmployee = (updatedEmployee) => {
-    const newList = employees.map(b =>
-      b.id === updatedEmployee.id ? updatedEmployee : b
-    );
+    const newList = employees.map(emp => emp.id === updatedEmployee.id ? updatedEmployee : emp);
     setEmployees(newList);
     setEditingEmployee(null); // Thoát chế độ sửa
   };
