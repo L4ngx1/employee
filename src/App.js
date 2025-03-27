@@ -28,6 +28,7 @@ function App() {
   const handleDeleteEmployee = (id) => {
     const newList = employees.filter(emp => emp.id !== id);
     setEmployees(newList);
+    setSelectedIds(prev => prev.filter(itemId => itemId !== id));// Cập nhật selectedIds để loại bỏ ID đã bị xóa
   };
   //hàm xử lý chọn/bỏ chọn 
   const handleSelectEmployee = (id) => {
