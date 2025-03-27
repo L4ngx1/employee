@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+/* global $ */
+
 function EmployeeForm({ onAdd, onUpdate, editingEmployee, onClose }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -21,10 +23,6 @@ function EmployeeForm({ onAdd, onUpdate, editingEmployee, onClose }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name || !email || !address || !phone) {
-      alert("Vui lòng nhập đầy đủ thông tin!");
-      return;
-    }
     if (editingEmployee) {
       // Update
       onUpdate({
@@ -34,6 +32,7 @@ function EmployeeForm({ onAdd, onUpdate, editingEmployee, onClose }) {
         address,
         phone,
       });
+      $("#employeeModal").modal("hide");//đóng modal jquery
     } else {
       // Add
       const newEmployee = {
@@ -44,6 +43,7 @@ function EmployeeForm({ onAdd, onUpdate, editingEmployee, onClose }) {
         phone,
       }; onAdd(newEmployee);
       setName(''); setEmail(''); setAddress(''); setPhone('');
+      $("#employeeModal").modal("hide");//đóng modal jquery
     }
   };
 

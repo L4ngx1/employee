@@ -1,10 +1,15 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import EmployeeForm from "./EmployeeForm";
 
 function App() {
-  const [employees, setEmployees] = useState([]);
+  const stored = JSON.parse(localStorage.getItem('employees'));
+  const [employees, setEmployees] = useState(stored);
   const [editingEmployee, setEditingEmployee] = useState(null);
+  const [selectedIds, setSelectedIds] = useState([]);
+  useEffect(() => {
+    localStorage.setItem('employees', JSON.stringify(employees));
+  }, [employees]);
   //Hàm thêm
   const handleAddEmployee = (employee) => {
     setEmployees([...employees, employee]);
@@ -23,14 +28,29 @@ function App() {
   };
   //Hàm xóa
   const handleDeleteEmployee = (id) => {
-    const newList = employees.filter(b => b.id !== id);
+    const newList = employees.filter(emp => emp.id !== id);
     setEmployees(newList);
   };
-  
-  const handleCloseEmployeeForm = () => {
+  //hàm xử lý chọn/bỏ chọn 
+  const handleSelectEmployee = (id) => {
+    setSelectedIds(
+      prev => prev.includes(id) ? prev.filter(itemId => itemId !== id) : [...prev, id]
+    );
+  };
+  //Hàm xóa chọn
+  const handleDeleteSelected = () => {
+    if (selectedIds.length === 0) return;
+
+    if (window.confirm(`Are you sure you want to delete ${selectedIds.length} selected employee?`)) {
+      const updatedEmployees = employees.filter(emp => !selectedIds.includes(emp.id));
+      setEmployees(updatedEmployees);
+      setSelectedIds([]); // Reset selection
+    }
+  };
+  const handleResetEmployeeForm = () => {
     setEditingEmployee(null); // Reset về chế độ thêm
   };
-  
+
   return (
     <div className="app d-flex flex-column min-vh-100">
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -38,7 +58,8 @@ function App() {
           <a className="navbar-brand fs-3 ms-3" href="/">Manage Employees</a>
           <ul className="navbar-nav justify-content-end ">
             <li className="nav-item me-2 me-lg-3">
-              <button type="button" className="btn btn-danger w-100">Delete</button>
+              <button type="button" className="btn btn-danger w-100"
+                onClick={handleDeleteSelected} disabled={selectedIds.length === 0}>Delete</button>
             </li>
             <li className="nav-item">
               <button type="button" className="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#employeeModal">
@@ -48,7 +69,7 @@ function App() {
                 onAdd={handleAddEmployee}
                 onUpdate={handleUpdateEmployee}
                 editingEmployee={editingEmployee}
-                onClose={handleCloseEmployeeForm}
+                onClose={handleResetEmployeeForm}
               />
             </li>
           </ul>
@@ -71,7 +92,12 @@ function App() {
             <tbody>
               {employees.map((emp) => (
                 <tr key={emp.id}>
-                  <th scope="row"><input type="checkbox" className="checkbox" /></th>
+                  <th scope="row">
+                    <input type="checkbox" className="checkbox"
+                      checked={selectedIds.includes(emp.id)}
+                      onChange={() => handleSelectEmployee(emp.id)}
+                    />
+                  </th>
                   <td>{emp.name}</td>
                   <td>{emp.email}</td>
                   <td>{emp.address}</td>
